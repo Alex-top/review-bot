@@ -1,5 +1,9 @@
 # Бот для сбора отзывов с интеграцией с Яндекс.Диском
 
+📚 [**Смотреть все проекты в портфолио**](https://github.com/Alex-top/portfolio)
+
+
+
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![VK API](https://img.shields.io/badge/VK%20API-5.199-blue)](https://dev.vk.com/)
 [![Yandex Disk API](https://img.shields.io/badge/Yandex%20Disk%20API-1.0-blue)](https://yandex.ru/dev/disk/)
@@ -154,5 +158,3 @@ GitHub: [ваш-username]
 | reminder-bot | ✅ Готов | Работает |
 | booking-bot | ✅ Готов | Работает |
 | review-bot | ✅ Готов | Работает |
-
-📚 [Смотреть все проекты в портфолио](https://github.com/ваш-аккаунт/portfolio)
