@@ -154,3 +154,5 @@ GitHub: [ваш-username]
 | reminder-bot | ✅ Готов | Работает |
 | booking-bot | ✅ Готов | Работает |
 | review-bot | ✅ Готов | Работает |
+
+📚 [Смотреть все проекты в портфолио](https://github.com/ваш-аккаунт/portfolio)
