@@ -30,6 +30,7 @@
 - 🧠 **Ядро** и **адаптер** — архитектура для любой платформы
 
 ## 🧠 Архитектура проекта
+```
 review-bot/
 ├── core/ # Ядро бизнес-логики
 │ ├── review_bot.py # Основной класс: добавление, чтение, статистика
@@ -51,6 +52,7 @@ review-bot/
 ├── .env # Токены VK и Яндекс.Диска
 ├── requirements.txt # Зависимости
 └── README.md # Описание проекта
+```
 
 
 ## 📦 Структура данных
@@ -76,9 +78,9 @@ git clone https://github.com/ваш-аккаунт/review-bot.git
 cd review-bot
 
 Создание и активация виртуального окружения
-python -m venv review_env
+python -m venv venv
 source review_env/bin/activate        # Linux/Mac
-review_env\Scripts\activate           # Windows
+venv\Scripts\activate           # Windows
 
 Установка зависимостей
 pip install -r requirements.txt
@@ -86,7 +88,7 @@ pip install -r requirements.txt
 Настройка окружения
 Создайте файл .env в корне проекта:
 VK_TOKEN=ваш_токен_сообщества
-VK_GROUP_ID=123456789
+VK_GROUP_ID=GROUP_ID
 YANDEX_TOKEN=ваш_oauth_токен_яндекса
 
 Как получить токены:
