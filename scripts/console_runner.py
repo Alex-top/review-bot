@@ -6,6 +6,13 @@
 import sys
 import os
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+print("🔍 Загрузка модулей...")
+
+import core.review_bot
+print(f"📂 Модуль ReviewBot: {core.review_bot.__file__}")
+
 # Добавляем путь к корню проекта
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -45,11 +52,14 @@ def main():
         print(f"❌ Ошибка инициализации бота: {e}")
         return
     
-    # === СИНХРОНИЗАЦИЯ С ЯНДЕКС.ДИСКОМ ===
+        # === СИНХРОНИЗАЦИЯ С ЯНДЕКС.ДИСКОМ ===
     yandex_token = os.getenv("YANDEX_TOKEN")
     if yandex_token and YandexDiskClient:
         try:
-            yandex_client = YandexDiskClient(yandex_token, "storage/reviews.csv", "/Отзывы/reviews.csv")
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            local_csv = os.path.join(base_dir, "storage", "reviews.csv")
+            
+            yandex_client = YandexDiskClient(yandex_token, local_csv, "/Отзывы/reviews.csv")
             print("🔄 Синхронизация с Яндекс.Диском...")
             yandex_client.sync_from_cloud()
             yandex_client.sync_to_cloud()
@@ -61,7 +71,7 @@ def main():
         print("ℹ️ Яндекс.Диск не настроен (токен не найден). Работаем локально.")
     
     print("\n📋 Доступные команды:")
-    print("  /add [оценка] [текст] - добавить отзыв (например: /add 5 Отличный сервис!)")
+    print("  /add [оценка 1 - 5] [текст] - добавить отзыв (например: /add 5 Отличный сервис!)")
     print("  /list - показать все отзывы")
     print("  /my - показать мои отзывы")
     print("  /stats - статистика")
@@ -69,7 +79,8 @@ def main():
     print("=" * 50)
     
     user_id = 1
-    user_name = "Тестовый пользователь"
+    #user_name = "Тестовый пользователь"
+    user_name = input("Введите ваше имя: ") or "Аноним"
     
     while True:
         try:
@@ -89,11 +100,15 @@ def main():
                 break
             
             if command.startswith("/add "):
+                print("🔍 Отладка: команда /add обнаружена")  # ← добавить
                 try:
                     parts = command.split(" ", 2)
+                    print(f"🔍 Отладка: parts = {parts}")  # ← добавить
                     rating = int(parts[1])
                     text = parts[2] if len(parts) > 2 else ""
+                    print(f"🔍 Отладка: rating = {rating}, text = {text}")  # ← добавить
                     review = bot.add_review(user_id, user_name, rating, text)
+                    print(f"🔍 Отладка: review = {review}")
                     print(f"🤖 Бот: ✅ Спасибо за отзыв! (ID: {review['id']})")
                     # Синхронизация после добавления отзыва
                     if yandex_token and YandexDiskClient:
@@ -103,9 +118,15 @@ def main():
                         except Exception as e:
                             print(f"⚠️ Ошибка синхронизации: {e}")
                 except ValueError as e:
-                    print(f"🤖 Бот: ❌ Ошибка: {e}")
+                    #print(f"🤖 Бот: ❌ Ошибка: {e}")
+                    print(f"🤖 Бот: ❌ Ошибка валидации: {e}")
+                    print("🤖 Бот: ❌ Неверный формат. Используйте: /add [оценка 1-5] [текст]")
+                    print("   Пример: /add 5 Отличный сервис!")
+                except KeyError as e:
+                    print(f"🤖 Бот: ❌ Ошибка KeyError: {e}")
+                    print(f"   review = {review}")
                 except Exception as e:
-                    print(f"🤖 Бот: ❌ Ошибка: {e}")
+                    print(f"🤖 Бот: ❌ Неизвестная ошибка: {e}")
             
             elif command == "/list":
                 reviews = bot.get_all_reviews()
@@ -113,8 +134,14 @@ def main():
                     print("🤖 Бот: 📭 Отзывов пока нет")
                 else:
                     print("🤖 Бот: 📋 Все отзывы:")
+                    print("=" * 60)
                     for r in reviews:
-                        print(f"  ID {r['id']} | {r['user_name']} | {r['rating']}⭐ | {r['text']} | {r['status']}")
+                        stars = "⭐" * int(r['rating'])
+                        print(f"  {stars} ({r['rating']}/5)")
+                        print(f"  👤 {r['user_name']}")
+                        print(f"  💬 {r['text']}")
+                        print(f"  📅 {r['date']}")
+                        print("-" * 60)
             
             elif command == "/my":
                 reviews = bot.get_user_reviews(user_id)
