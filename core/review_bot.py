@@ -11,16 +11,65 @@ from typing import List, Dict, Optional, Tuple
 class ReviewBot:
     """Основной класс для работы с отзывами"""
     
-    def __init__(self, csv_file: str = "storage/reviews.csv"):
+    #def __init__(self, csv_file: str = "storage/reviews.csv"):
+        #self.csv_file = csv_file
+        #self._ensure_file_exists()
+    
+    #import os
+
+class ReviewBot:
+    def __init__(self, csv_file: str = None):
+        # Если путь не указан — используем путь по умолчанию
+        if csv_file is None:
+            # Определяем путь к папке storage относительно текущего файла
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            csv_file = os.path.join(base_dir, "storage", "reviews.csv")
+        
         self.csv_file = csv_file
+        
+        # Убеждаемся, что папка storage существует
+        os.makedirs(os.path.dirname(csv_file), exist_ok=True)
+        
         self._ensure_file_exists()
     
     def _ensure_file_exists(self):
-        """Создаёт CSV-файл с заголовками, если он не существует"""
+        """
+        Проверяет, что CSV-файл существует и содержит правильные заголовки.
+        Если файла нет, он пуст или заголовки неверные — создаёт/исправляет.
+        """
+        required_headers = ['id', 'user_id', 'user_name', 'rating', 'text', 'date', 'status']
+        
+        need_create = False
+        
+        # 1. Проверяем, существует ли файл
         if not os.path.exists(self.csv_file):
+            print(f"📁 Файл {self.csv_file} не найден. Создаю...")
+            need_create = True
+        else:
+            # 2. Проверяем, есть ли в файле заголовки
+            try:
+                with open(self.csv_file, 'r', encoding='utf-8') as f:
+                    first_line = f.readline().strip()
+                    
+                    # Если файл пустой или заголовки не совпадают
+                    if not first_line:
+                        print(f"⚠️ Файл {self.csv_file} пуст. Добавляю заголовки...")
+                        need_create = True
+                    elif not all(header in first_line for header in required_headers):
+                        print(f"⚠️ Файл {self.csv_file} содержит неверные заголовки. Исправляю...")
+                        need_create = True
+            except Exception as e:
+                print(f"⚠️ Ошибка чтения файла: {e}. Пересоздаю...")
+                need_create = True
+        
+        # 3. Создаём или пересоздаём файл с правильными заголовками
+        if need_create:
             with open(self.csv_file, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
-                writer.writerow(['id', 'user_id', 'user_name', 'rating', 'text', 'date', 'status'])
+                writer.writerow(required_headers)
+            print(f"✅ Файл {self.csv_file} создан с заголовками")
+        else:
+            print(f"✅ Файл {self.csv_file} в порядке")
     
     def _get_next_id(self) -> int:
         """Возвращает следующий ID для нового отзыва"""
@@ -42,17 +91,12 @@ class ReviewBot:
         return reviews
     
     def add_review(self, user_id: int, user_name: str, rating: int, text: str) -> Dict[str, str]:
-        """
-        Добавляет новый отзыв.
-        Возвращает добавленный отзыв в виде словаря.
-        """
-        # Валидация
+        """Добавляет новый отзыв"""
         if not text or len(text.strip()) < 3:
             raise ValueError("Текст отзыва должен содержать минимум 3 символа")
         if rating < 1 or rating > 5:
             raise ValueError("Оценка должна быть от 1 до 5")
         
-        # Формируем запись
         review = {
             'id': str(self._get_next_id()),
             'user_id': str(user_id),
@@ -62,8 +106,9 @@ class ReviewBot:
             'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'status': 'new'
         }
-        
-        # Добавляем в CSV
+
+        print(f"🔍 Отладка: review = {review}")  #
+
         with open(self.csv_file, 'a', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=['id', 'user_id', 'user_name', 'rating', 'text', 'date', 'status'])
             writer.writerow(review)

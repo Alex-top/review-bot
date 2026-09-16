@@ -13,6 +13,7 @@ review_bot/
 *.db
 *.sqlite
 *.sqlite3
+storage/*.csv
 
 # Файлы Python
 __pycache__/
