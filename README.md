@@ -74,7 +74,7 @@ review-bot/
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/ваш-аккаунт/review-bot.git
+git clone https://github.com/Alex-top/review-bot.git
 cd review-bot
 
 Создание и активация виртуального окружения
